@@ -9,4 +9,3 @@
   count-articles
   [out params]
   (db/query "select count(*) from article" out))
-
