@@ -1,0 +1,9 @@
+{
+  'db-config': {
+    'address': 'postgres.query',
+    'host': 'localhost',
+    'username': 'vanity',
+    'password':  'vanity',
+    'database':  'vanity'
+  }
+}
