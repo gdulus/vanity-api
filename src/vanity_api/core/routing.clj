@@ -41,7 +41,7 @@
   (fn [req]
     (let [resp (-> (http/server-response req)
                    (http/add-header "Content-Type" content-type))]
-      (executor (partial http/end resp)))))
+      (executor (partial http/end resp) (http/params req)))))
 
 ;; ------------------------------------------------------------------------------
 

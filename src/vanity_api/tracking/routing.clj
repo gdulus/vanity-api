@@ -7,12 +7,6 @@
 (defn
   ^{ :method route/get :url "/tracking/vip/:id" :content-type "application/json" }
   pixel-vip
-  [out]
+  [out params]
   (db/query "select count(*) from article" out))
 
-
-;;(defn
-;;  ^{ :method route/get :url "/tracking/article/:id" :content-type "application/json" }
-;;  pixel-article
-;;  [params]
-;;  (str "hello from pixel article " (params :id)))
