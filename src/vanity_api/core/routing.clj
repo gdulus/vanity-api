@@ -23,7 +23,7 @@
 (defn- get-handler-descriptor
   "Transforms raw data into handler descriptor"
   [fn meta]
-  {:url (:url meta) :method (:method meta) :handler fn})
+  (assoc meta :handler fn))
 
 ;; ------------------------------------------------------------------------------
 
@@ -37,9 +37,10 @@
 
 (defn- build-request-wrapper
   "Wraps custom handlers in function providing request parameters"
-  [executor]
+  [content-type executor]
   (fn [req]
     (-> (http/server-response req)
+        (http/add-header "Content-Type" content-type)
         (http/end (executor (http/params req))))))
 
 ;; ------------------------------------------------------------------------------
@@ -49,12 +50,13 @@
   [namepace handler-descriptor route]
   (let [executor (ns-resolve namepace (handler-descriptor :handler))
         method (handler-descriptor :method)
-        url (handler-descriptor :url)]
+        url (handler-descriptor :url)
+        content-type (handler-descriptor :content-type)]
     (do
       (log/info (str "Registering route " url))
       (if (nil? route)
-      (method url (build-request-wrapper executor))
-      (method route url (build-request-wrapper executor))))))
+        (method url (build-request-wrapper content-type executor))
+        (method route url (build-request-wrapper content-type executor))))))
 
 ;; ------------------------------------------------------------------------------
 
