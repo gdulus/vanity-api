@@ -5,7 +5,7 @@
 ;; Confif core functions
 ;; ------------------------------------------------------------------------------
 
-(def ^:private config { :db-config { :address   "postgres.query"
+(def ^:private config { :db-config { :address   "channel.db"
                                      :host      "localhost"
                                      :username  "vanity"
                                      :password  "vanity"

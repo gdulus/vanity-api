@@ -39,9 +39,9 @@
   "Wraps custom handlers in function providing request parameters"
   [content-type executor]
   (fn [req]
-    (-> (http/server-response req)
-        (http/add-header "Content-Type" content-type)
-        (http/end (executor (http/params req))))))
+    (let [resp (-> (http/server-response req)
+                   (http/add-header "Content-Type" content-type))]
+      (executor (partial http/end resp)))))
 
 ;; ------------------------------------------------------------------------------
 
