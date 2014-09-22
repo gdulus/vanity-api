@@ -1,11 +1,24 @@
 (ns vanity-api.tracking.routing
   (:require [vertx.http.route :as route]
-            [vertx.eventbus :as eb]
-            [vertx.http :as http]
-            [vanity-api.core.db :as db]))
+            [vanity-api.db.core :as db-core]
+            [vanity-api.db.utils :as db-utils]))
+
+;; ------------------------------------------------------------------------------
 
 (defn
-  ^{ :method route/get :url "/articles/count" :content-type "application/json" }
-  count-articles
+  ^{ :method route/get :url "/tracking/article/:id" :content-type "image/gif" }
+  tracking-article
   [out params]
-  (db/query "select count(*) from article" out))
+  (db-core/insert-nextval "popularity"
+                          {:day (db-utils/today) :rank 1 :class "vanity.stats.ArticlePopularity" :article_id (params :id)}
+                          (fn[result](out ""))))
+
+;; ------------------------------------------------------------------------------
+
+(defn
+  ^{ :method route/get :url "/tracking/tag/:id" :content-type "image/gif" }
+  tracking-tag
+  [out params]
+  (db-core/insert-nextval "popularity"
+                          {:day (db-utils/today) :rank 1 :class "vanity.stats.TagPopularity" :tag_id (params :id)}
+                          (fn[result](out ""))))
