@@ -1,12 +1,11 @@
 (ns vanity-api.core
   (:require [vanity-api.core.routing :as vanity-routing]
             [vanity-api.core.config :as vanity-config]
-            [vanity-api.tracking.routing]
             [vertx.core :as vertx]
-            [vertx.eventbus :as eb]
             [vertx.http :as http]
-            [vertx.http.route :as route]
-            [vertx.logging :as log]))
+            [vertx.logging :as log]
+            [vanity-api.tracking.routing]
+            [vanity-api.auth.routing]))
 
 
 ;; ------------------------------------------------------------------------------
@@ -15,7 +14,8 @@
 
 (defn- start-server []
   (-> (http/server)
-    (http/on-request (vanity-routing/build-ns-routes 'vanity-api.tracking.routing))
+    (http/on-request (vanity-routing/build-routes ['vanity-api.auth.routing
+                                                   'vanity-api.tracking.routing]))
     (http/listen 8080)))
 
 ;; ------------------------------------------------------------------------------

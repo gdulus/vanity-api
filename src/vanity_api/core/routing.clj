@@ -22,16 +22,15 @@
 
 (defn- get-handler-descriptor
   "Transforms raw data into handler descriptor"
-  [fn meta]
-  (assoc meta :handler fn))
+  [fn namespace]
+  (assoc (get-fn-meta namespace fn) :handler fn :ns namespace))
 
 ;; ------------------------------------------------------------------------------
 
-(defn get-all-handler-descriptors
+(defn- get-all-handler-descriptors
   "Transforms function from specified namespace into handelr descriptors"
   [namespace]
-  ;; we need to use inplementation of IParsistenList (to use pop)
-  (reduce #(conj %1 (get-handler-descriptor %2 (get-fn-meta namespace %2))) '() (get-all-fn namespace)))
+  (reduce #(conj %1 (get-handler-descriptor %2 namespace)) '() (get-all-fn namespace)))
 
 ;; ------------------------------------------------------------------------------
 
@@ -47,8 +46,9 @@
 
 (defn- build-route
   "Builds one single vertx route matcher"
-  [namepace handler-descriptor route]
-  (let [executor (ns-resolve namepace (handler-descriptor :handler))
+  [handler-descriptor route]
+  (let [namespace (handler-descriptor :ns)
+        executor (ns-resolve namespace (handler-descriptor :handler))
         method (handler-descriptor :method)
         url (handler-descriptor :url)
         content-type (handler-descriptor :content-type)]
@@ -60,12 +60,10 @@
 
 ;; ------------------------------------------------------------------------------
 
-(defn build-ns-routes
+(defn build-routes
   "Builds for specific namespace chain of vertx route matchers"
-  [namepace]
-  (let [descriptors (get-all-handler-descriptors namepace)
-        parent-route (build-route namepace (first descriptors) nil)]
-    (reduce #(build-route namepace %2 %1) parent-route (pop descriptors))))
-
-
-
+  [namespaces]
+  (let [descriptors (vec (reduce #(concat %1 (get-all-handler-descriptors %2)) '() namespaces))
+        parent-descriptor (last descriptors)
+        parent-route (build-route parent-descriptor nil)]
+    (reduce #(build-route %2 %1) parent-route (pop descriptors))))
